@@ -44,6 +44,7 @@ public struct Triple: Encodable, Equatable {
         case arm64
         case arm64e
         case wasm32
+        case thumbv7em
     }
 
     public enum Vendor: String, Encodable {
@@ -57,11 +58,15 @@ public struct Triple: Encodable, Equatable {
         case linux
         case windows
         case wasi
+        case madmachine
+        case none
     }
 
     public enum ABI: String, Encodable {
         case unknown
         case android
+        case eabi
+        case eabihf
     }
 
     public init(_ string: String) throws {
@@ -125,6 +130,10 @@ public struct Triple: Encodable, Equatable {
         return os == .wasi
     }
 
+    public func isMadMachine() -> Bool {
+        return os == .madmachine
+    }
+
     /// Returns the triple string for the given platform version.
     ///
     /// This is currently meant for Apple platforms only.
@@ -171,7 +180,7 @@ extension Triple {
         switch os {
         case .darwin, .macOS:
             return ".dylib"
-        case .linux:
+        case .linux, .madmachine, .none:
             return ".so"
         case .windows:
             return ".dll"
@@ -184,7 +193,7 @@ extension Triple {
       switch os {
       case .darwin, .macOS:
         return ""
-      case .linux:
+      case .linux, .madmachine, .none:
         return ""
       case .wasi:
         return ".wasm"
